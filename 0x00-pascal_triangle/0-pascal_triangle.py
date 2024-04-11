@@ -20,4 +20,4 @@ def pascal_triangle(n):
             temp.append(k[i - 1][j] + k[i - 1][j + 1])
         temp.append(1)
         k.append(temp)
-    return k 
+    return k
