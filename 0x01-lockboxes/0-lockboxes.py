@@ -22,21 +22,18 @@ Returns:
     bool: True if all boxes can be opened, False otherwise.
 """
 
-
-def can_unlock_all(boxes):
-    if not boxes:
+def canUnlockAll(boxes):
+    if not isinstance(boxes, list) or len(boxes) == 0:
         return False
-
+    
     num_boxes = len(boxes)
-    visited = set()
-    queue = [0]  # Start with the first box
-    visited.add(0)
-
-    while queue:
-        current_box = queue.pop(0)
-        for key in boxes[current_box]:
-            if key < num_boxes and key not in visited:
-                queue.append(key)
-                visited.add(key)
-
-    return len(visited) == num_boxes
+    
+    for key in range(1, num_boxes):
+        box_checked = False
+        for idx, box in enumerate(boxes):
+            if key in box and idx != key:
+                box_checked = True
+                break
+        if not box_checked:
+            return False
+    return True
