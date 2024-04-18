@@ -22,12 +22,13 @@ Returns:
     bool: True if all boxes can be opened, False otherwise.
 """
 
+
 def canUnlockAll(boxes):
     if not isinstance(boxes, list) or len(boxes) == 0:
         return False
-    
+
     num_boxes = len(boxes)
-    
+
     for key in range(1, num_boxes):
         box_checked = False
         for idx, box in enumerate(boxes):
