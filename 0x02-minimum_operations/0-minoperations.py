@@ -11,17 +11,17 @@ def minOperations(n: int) -> int:
 
     Returns: Integer, the minimum number of operations required.
     """
-    next = 'H'
-    body = 'H'
-    operation = 0
-    while (len(body) < n):
-        if n % len(body) == 0:
-            operation += 2
-            next = body
-            body += body
-        else:
-            operation += 1
-            body += next
-    if len(body) != n:
+    if n <= 1:
         return 0
-    return operation
+
+    operations = 0
+    current_length = 1
+    while current_length < n:
+        if n % current_length == 0:
+            current_length *= 2
+            operations += 2
+        else:
+            current_length += 1
+            operations += 1
+
+    return operations
