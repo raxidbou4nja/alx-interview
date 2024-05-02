@@ -5,6 +5,7 @@ Log Parsing
 
 import sys
 import re
+from datetime import datetime
 
 
 def display_statistics(log):
@@ -39,5 +40,5 @@ if __name__ == "__main__":
 
                 if line_count % 10 == 0:
                     display_statistics(log)
-    finally:
+    except KeyboardInterrupt:
         display_statistics(log)
