@@ -1,61 +1,50 @@
 #!/usr/bin/python3
+"""
+log parsing
+"""
+
 import sys
-import signal
-
-"""
-Reads stdin line by line and computes metrics
-"""
-
-total_size = 0
-status_code_count = {200: 0, 301: 0, 400: 0,
-                     401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
-line_count = 0
+import re
 
 
-def print_statistics():
+def output(log: dict) -> None:
     """
-    Print the total file size and count of each status code.
+    Helper function to display stats
     """
-    print("Total file size:", total_size)
-    for status_code in sorted(status_code_count.keys()):
-        if status_code_count[status_code] > 0:
-            print(f"{status_code}: {status_code_count[status_code]}")
+    print("File size: {}".format(log["file_size"]))
+    for code in sorted(log["code_frequency"]):
+        if log["code_frequency"][code]:
+            print("{}: {}".format(code, log["code_frequency"][code]))
 
 
-def signal_handler(signal, frame):
-    """
-    Handle the SIGINT signal (Ctrl+C) by printing statistics and exiting.
-    """
-    print_statistics()
-    sys.exit(0)
+if __name__ == "__main__":
+    regex = re.compile(
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} - \[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d+\] "GET /projects/260 HTTP/1.1" (.{3}) (\d+)')  # nopep8
 
+    line_count = 0
+    log = {}
+    log["file_size"] = 0
+    log["code_frequency"] = {
+        str(code): 0 for code in [
+            200, 301, 400, 401, 403, 404, 405, 500]}
 
-signal.signal(signal.SIGINT, signal_handler)
-try:
-    for line in sys.stdin:
-        line = line.strip()
-        parts = line.split()
-        if len(parts) != 7:
-            continue
+    try:
+        for line in sys.stdin:
+            line = line.strip()
+            match = regex.fullmatch(line)
+            if match:
+                line_count += 1
+                code = match.group(1)
+                file_size = int(match.group(2))
 
-        ip, _, _, status_code, file_size, *_ = parts
-        try:
-            status_code = int(status_code)
-            file_size = int(file_size)
-        except ValueError:
-            continue
+                # File size
+                log["file_size"] += file_size
 
-        if status_code in status_code_count:
-            status_code_count[status_code] += 1
-            total_size += file_size
-            line_count += 1
+                # status code
+                if code.isdecimal():
+                    log["code_frequency"][code] += 1
 
-        if line_count == 10:
-            print_statistics()
-            line_count = 0
-
-    print_statistics()
-
-
-except KeyboardInterrupt:
-    print_statistics()
+                if line_count % 10 == 0:
+                    output(log)
+    finally:
+        output(log)
