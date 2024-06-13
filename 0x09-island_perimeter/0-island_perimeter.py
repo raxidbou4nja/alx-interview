@@ -3,6 +3,7 @@
 
 
 def island_perimeter(grid):
+    """Return the perimiter of an island."""
     if not grid or not grid[0]:
         return 0
 
